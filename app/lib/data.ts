@@ -9,7 +9,13 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+declare global {
+  // eslint-disable-next-line no-var
+  var _sql: ReturnType<typeof postgres> | undefined;
+}
+
+const sql = global._sql ?? postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+if (process.env.NODE_ENV !== 'production') global._sql = sql;
 
 export async function fetchRevenue() {
   try {
